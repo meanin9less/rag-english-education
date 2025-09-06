@@ -161,3 +161,42 @@ class Word(Base):
     level = Column(String(20), nullable=False)  # basic, middle, high
     created_at = Column(DateTime, default=datetime.utcnow)
 
+# 요청 데이터 구조를 위한 클래스들 (SQLAlchemy 모델이 아닌 일반 클래스)
+class CategoryRequest:
+    """카테고리 요청 구조"""
+    def __init__(self, name: str, subcategories: list, ratio: int):
+        self.name = name
+        self.subcategories = subcategories
+        self.ratio = ratio
+
+class DifficultyDistribution:
+    """난이도 분배 구조"""
+    def __init__(self, high: int = 20, medium: int = 60, low: int = 20):
+        self.high = high  # 상
+        self.medium = medium  # 중
+        self.low = low  # 하
+
+class ContentGenerationRequest:
+    """콘텐츠 생성 요청 구조"""
+    def __init__(self, grade: int, categories: list, question_type: str, 
+                 difficulty: str, total_questions: int, difficulty_distribution: dict = None):
+        self.grade = grade
+        self.categories = [CategoryRequest(**cat) if isinstance(cat, dict) else cat for cat in categories]
+        self.question_type = question_type
+        self.difficulty = difficulty
+        self.total_questions = total_questions
+        
+        if difficulty_distribution:
+            self.difficulty_distribution = DifficultyDistribution(**difficulty_distribution)
+        else:
+            # 기본 분배
+            self.difficulty_distribution = DifficultyDistribution()
+
+class QuestionDistribution:
+    """문제 분배 결과"""
+    def __init__(self, category: str, subcategory: str, count: int, difficulty_level: str):
+        self.category = category
+        self.subcategory = subcategory
+        self.count = count
+        self.difficulty_level = difficulty_level
+
